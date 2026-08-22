@@ -1,0 +1,70 @@
+TASK 5: EVALUATE AND DOCUMENT BASELINE MODEL
+
+Objective:
+The objective of this task was to evaluate the baseline academic integrity classification model using standard machine learning performance metrics and document its strengths, weaknesses, and potential improvements.
+
+Methodology:
+The Logistic Regression baseline model trained in Task 4 was loaded from baseline_model.pkl. The saved TF-IDF vectorizer was loaded from tfidf_vectorizer.pkl and used to transform the test submissions. The model predictions were then compared with the actual labels in test_data.csv.
+
+Evaluation Metrics:
+- Accuracy
+- Precision
+- Recall
+- F1 Score
+- Confusion Matrix
+
+Dataset:
+Training data: 12 samples
+Testing data: 2 samples
+Test classes:
+- Original: 1
+- Plagiarized: 1
+
+Results:
+
+Accuracy: 50%
+Precision: 0%
+Recall: 0%
+F1 Score: 0%
+
+Confusion Matrix:
+
+                    Predicted
+                    Original  Plagiarized
+Actual Original         1          0
+Actual Plagiarized      1          0
+
+Prediction Analysis:
+
+Actual Labels:
+['original', 'plagiarized']
+
+Predicted Labels:
+['original', 'original']
+
+The model correctly classified the original submission but incorrectly classified the plagiarized submission as original.
+
+Strengths:
+1. The complete evaluation pipeline was successfully implemented.
+2. The model can process text using TF-IDF and produce classification predictions.
+3. Accuracy, precision, recall, F1 score, and confusion matrix were calculated automatically.
+4. The evaluation process is reproducible because the trained model and TF-IDF vectorizer were saved.
+
+Weaknesses:
+1. The model failed to detect the plagiarized test sample.
+2. Precision, recall, and F1 score for the plagiarized class were 0%.
+3. The evaluation dataset is extremely small, containing only two test samples.
+4. The current results cannot be considered representative of real-world plagiarism detection performance.
+
+Benchmark:
+The current results are treated as the baseline benchmark for this project. Future models and improvements can be compared against these results to determine whether performance has improved.
+
+Potential Improvements:
+- Use a larger and more diverse plagiarism dataset.
+- Improve text preprocessing and feature extraction.
+- Experiment with other machine learning algorithms.
+- Use more validation samples for reliable evaluation.
+- Explore similarity-based and advanced NLP techniques.
+
+Conclusion:
+The baseline model evaluation was successfully completed. The model achieved 50% accuracy but failed to detect the plagiarized test sample, resulting in 0% precision, recall, and F1 score. Although the current performance is limited, the evaluation establishes a measurable baseline for future improvements.
