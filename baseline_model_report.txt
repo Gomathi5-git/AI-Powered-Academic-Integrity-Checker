@@ -1,0 +1,37 @@
+TASK 4: TRAIN BASELINE MODEL
+
+Model:
+Logistic Regression
+
+Text Feature Extraction:
+TF-IDF Vectorization with English stop-word removal
+
+Training Data:
+12 samples
+6 original
+6 plagiarized
+
+Testing Data:
+2 samples
+1 original
+1 plagiarized
+
+TF-IDF Features:
+Training: 12 samples × 26 features
+Testing: 2 samples × 26 features
+
+Baseline Results:
+Accuracy: 50%
+Precision: 0%
+Recall: 0%
+
+Confusion Matrix:
+                Predicted
+                Original  Plagiarized
+Actual Original      1          0
+       Plagiarized   1          0
+
+Observations:
+The baseline model correctly classified the original test submission but failed to identify the plagiarized test submission. The model predicted both test samples as original. The low precision and recall indicate that the baseline model is not yet effective at detecting plagiarism.
+
+The results should be interpreted cautiously because the dataset is very small, with only two test samples. This baseline provides a starting point for future improvements using a larger dataset, better preprocessing, and more advanced models.
