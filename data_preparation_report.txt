@@ -1,0 +1,29 @@
+TASK 3: PREPARE TRAINING DATA
+
+Original Class Distribution:
+Original: 7
+Plagiarized: 3
+
+The dataset was split into 80% training data and 20% testing data using stratified splitting with random_state=42.
+
+Training Distribution Before Balancing:
+Original: 6
+Plagiarized: 2
+
+Balancing Method:
+Random Oversampling was applied only to the training dataset.
+
+Training Distribution After Balancing:
+Original: 6
+Plagiarized: 6
+
+Testing Distribution:
+Original: 1
+Plagiarized: 1
+
+The test dataset was kept unchanged to provide an unbiased evaluation of the model.
+
+Files Generated:
+- training_data_balanced.csv
+- test_data.csv
+- prepare_training_data.py
