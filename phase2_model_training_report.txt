@@ -1,0 +1,72 @@
+PHASE 2 - TASK 1: IMPLEMENT MODEL TRAINING
+
+Objective:
+The objective of this task was to implement a flexible machine learning training pipeline for detecting plagiarism. Multiple classification algorithms were trained and compared using the same NLP feature extraction process.
+
+Training Pipeline:
+The training pipeline follows these steps:
+
+1. Load the balanced training dataset and test dataset.
+2. Separate the text submissions from their labels.
+3. Convert the text into numerical features using TF-IDF vectorization.
+4. Train multiple machine learning classification algorithms.
+5. Generate predictions using each trained model.
+6. Calculate accuracy, precision, recall, and F1 score.
+7. Compare the performance of all models.
+8. Save the comparison results for future analysis.
+
+NLP Preprocessing:
+TF-IDF (Term Frequency-Inverse Document Frequency) was used to convert academic submission text into numerical features. English stop words were removed during vectorization.
+
+Models Implemented:
+
+1. Logistic Regression
+Logistic Regression was used as a simple baseline classification algorithm.
+
+2. Support Vector Machine (SVM)
+A linear SVM was implemented to provide another classification approach suitable for text features.
+
+3. Random Forest
+Random Forest was implemented using multiple decision trees to provide a different machine learning approach for comparison.
+
+Model Configuration:
+- Logistic Regression: random_state=42, max_iter=1000
+- SVM: linear kernel, random_state=42
+- Random Forest: 100 estimators, random_state=42
+
+Results:
+
+Model                  Accuracy   Precision   Recall   F1 Score
+Logistic Regression    50%        0%          0%       0%
+SVM                    50%        0%          0%       0%
+Random Forest          50%        0%          0%       0%
+
+Analysis:
+All three models produced the same evaluation results on the current test dataset. Each model achieved 50% accuracy and 0% precision, recall, and F1 score.
+
+The models correctly classified the original test sample but failed to identify the plagiarized test sample.
+
+Limitations:
+The main limitation is the very small dataset. The test dataset contains only two samples, one original and one plagiarized. Because of this small sample size, the evaluation results are not sufficient to determine which algorithm would perform better on real-world academic submissions.
+
+The identical scores should therefore be treated as an initial comparison rather than evidence that all three algorithms have identical real-world performance.
+
+Challenges:
+The small dataset made it difficult to obtain meaningful differences between the models. Another challenge was ensuring that the same TF-IDF representation and evaluation metrics were applied consistently to all three algorithms.
+
+Future Improvements:
+- Use a larger and more diverse plagiarism dataset.
+- Increase the size of the validation/test dataset.
+- Experiment with different NLP preprocessing techniques.
+- Tune the hyperparameters of each model.
+- Test additional classification algorithms.
+- Compare the models using cross-validation.
+- Prepare the trained models for future integration with an Elasticsearch-based search/query system.
+
+Code Structure:
+- train_multiple_models.py: Implements the complete multi-model training and evaluation pipeline.
+- model_comparison_results.csv: Stores the performance comparison of the three models.
+- multi_model_tfidf_vectorizer.pkl: Stores the TF-IDF vectorizer used by the training pipeline.
+
+Conclusion:
+A functional multi-model training pipeline was successfully implemented using TF-IDF, Logistic Regression, SVM, and Random Forest. The pipeline automatically trains and evaluates all three models and produces a comparison of their performance. The current results establish an initial benchmark, while the small dataset indicates that further testing with a larger dataset is required before selecting the best model for real-world deployment.
