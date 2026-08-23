@@ -61,3 +61,68 @@ The text will be processed before being given to the machine learning model.
 ```text
 Machine learning is a branch of artificial intelligence
 that enables computers to learn patterns from data.
+
+## Phase 2 - Task 3: Model Architecture Comparison
+
+### Objective
+
+The objective of this task was to compare multiple machine learning
+architectures for classifying academic submissions as original or
+plagiarized.
+
+### Implementation
+
+The prepared text dataset was converted into numerical features using
+TF-IDF. Three machine learning algorithms were evaluated:
+
+- **Logistic Regression** - linear classification algorithm
+- **SVM** - margin-based classification algorithm
+- **Random Forest** - ensemble model based on multiple decision trees
+
+The models were trained using the prepared training data and evaluated
+on the independent test dataset using Accuracy, Precision, Recall, and
+F1 Score.
+
+### Model Comparison
+
+| Model | Accuracy | Precision | Recall | F1 Score |
+|---|---:|---:|---:|---:|
+| Logistic Regression | 0.50 | 0.00 | 0.00 | 0.00 |
+| SVM | 0.50 | 0.00 | 0.00 | 0.00 |
+| Random Forest | 0.50 | 0.00 | 0.00 | 0.00 |
+
+### Hyperparameter Tuning Comparison
+
+During the previous hyperparameter tuning task, Random Forest achieved
+the highest 3-fold cross-validation F1 score of **91.11%** using
+`n_estimators=50` and `max_depth=None`.
+
+Logistic Regression achieved a cross-validation F1 score of **65.56%**,
+while SVM also achieved **65.56%**.
+
+### Findings
+
+Random Forest showed the strongest cross-validation performance among
+the tested models and is therefore the current candidate for further
+development.
+
+However, all three models achieved 50% accuracy on the independent test
+set. This result should not be interpreted as reliable production
+performance because the current dataset is extremely small.
+
+### Dataset Limitation
+
+The current dataset contains only **12 training samples and 2 test
+samples**. With only two test samples, a single incorrect prediction
+changes the accuracy by 50 percentage points.
+
+Therefore, the current model comparison is preliminary. A larger and
+more representative plagiarism dataset is required before making a
+final production model selection.
+
+### Generated Files
+
+- `compare_model_architectures.py` - model comparison implementation
+- `model_architecture_comparison.csv` - comparison metrics
+- `model_architecture_comparison.png` - performance visualization
+- `model_architecture_report.txt` - detailed findings and recommendation
