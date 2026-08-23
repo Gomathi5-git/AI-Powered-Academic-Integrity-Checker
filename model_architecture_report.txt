@@ -1,0 +1,70 @@
+MODEL ARCHITECTURE COMPARISON REPORT
+====================================
+
+Objective:
+The objective of this task was to compare different machine learning
+architectures for detecting plagiarized and original academic text.
+
+Data Preparation:
+The prepared training dataset was converted into numerical features
+using TF-IDF. The same TF-IDF vectorizer was used for the test data
+to maintain consistency.
+
+Models Evaluated:
+1. Logistic Regression - a linear classification algorithm.
+2. SVM - a margin-based classification algorithm.
+3. Random Forest - an ensemble of multiple decision trees.
+
+Evaluation Metrics:
+The models were evaluated using Accuracy, Precision, Recall, and
+F1 Score.
+
+Test Results:
+Logistic Regression:
+Accuracy: 0.50
+Precision: 0.00
+Recall: 0.00
+F1 Score: 0.00
+
+SVM:
+Accuracy: 0.50
+Precision: 0.00
+Recall: 0.00
+F1 Score: 0.00
+
+Random Forest:
+Accuracy: 0.50
+Precision: 0.00
+Recall: 0.00
+F1 Score: 0.00
+
+Hyperparameter Tuning Results:
+In the previous tuning task, Random Forest achieved the highest
+3-fold cross-validation F1 score of 0.9111 (91.11%) using
+50 estimators and no maximum depth restriction.
+
+Logistic Regression achieved a cross-validation F1 score of
+0.6556, while SVM also achieved 0.6556.
+
+Findings:
+Random Forest showed the strongest cross-validation performance
+among the tested models. However, all three models achieved the
+same results on the independent test set.
+
+Recommendation:
+Random Forest is the current candidate for further development
+because it achieved the highest cross-validation F1 score.
+However, the model cannot yet be considered production-ready.
+
+Dataset Limitation:
+The current dataset is extremely small, containing only 12 training
+samples and 2 test samples. With only two test samples, one
+prediction can change the test accuracy by 50 percentage points.
+Therefore, the current results are preliminary and should not be
+treated as reliable real-world performance.
+
+Future Improvement:
+The system should be evaluated using a much larger and more
+representative plagiarism dataset. With more data, model
+performance, generalization, and architecture selection can be
+evaluated more reliably.
