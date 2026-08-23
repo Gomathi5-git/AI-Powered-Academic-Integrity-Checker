@@ -1,0 +1,48 @@
+==================================================
+MODEL SELECTION & VALIDATION REPORT
+==================================================
+
+1. DATASET INFORMATION
+----------------------
+Source file       : training_data_balanced.csv
+Total samples     : 12
+Number of classes : 2
+Class counts      :
+label
+original       6
+plagiarized    6
+Validation method : Stratified K-Fold Cross-Validation
+Folds used        : 5
+
+2. MODELS EVALUATED & HYPERPARAMETERS
+-------------------------------------
+1. Logistic Regression: C=0.1, max_iter=1000, random_state=42
+2. SVM: C=1.0, kernel='linear', random_state=42
+3. Random Forest: n_estimators=50, max_depth=None, random_state=42
+
+3. CROSS-VALIDATION RESULTS
+---------------------------
+              Model  Accuracy Mean  Accuracy Std  Precision Mean  Precision Std  Recall Mean  Recall Std  F1 Mean   F1 Std
+Logistic Regression       0.533333      0.244949        0.466667       0.323179          0.8         0.4 0.566667 0.326599
+                SVM       0.666667      0.182574        0.600000       0.374166          0.7         0.4 0.600000 0.326599
+      Random Forest       0.900000      0.200000        0.900000       0.200000          1.0         0.0 0.933333 0.133333
+
+4. FINAL MODEL SELECTION
+------------------------
+Selected Model: Random Forest
+Selection Reason:
+- Random Forest achieved the highest Mean F1 Score of 0.9333 (±0.1333) across the cross-validation folds.
+- F1 score prioritizes a balance between Precision (avoiding false plagiarism flags) and Recall (detecting true plagiarism).
+
+5. DATASET LIMITATIONS & STABILITY WARNING
+------------------------------------------
+- The training dataset is intentionally small (prototype stage with 12 samples).
+- Cross-validation on small sample sizes leads to high metric variance and potential over-optimistic performance estimates.
+- The reported metrics represent a preliminary baseline benchmark, NOT production-level performance.
+
+6. RECOMMENDED FUTURE IMPROVEMENTS
+----------------------------------
+1. Collect a significantly larger, diverse academic plagiarism dataset.
+2. Evaluate performance across balanced original and plagiarized samples.
+3. Implement advanced semantic similarity techniques and transformer architectures (e.g. BERT/RoBERTa).
+4. Perform continuous monitoring and validation using MLflow experiment tracking.

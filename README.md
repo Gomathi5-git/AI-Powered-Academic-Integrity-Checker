@@ -330,4 +330,74 @@ Run the experiment tracking script:
 
 ```bash
 python track_experiments.py
+```
+
+---
+
+## Phase 2 – Task 5: Select & Validate
+
+### Objective
+
+The objective of Task 5 is to perform statistical validation across candidate machine learning models using K-Fold Cross-Validation, enabling a reliable model-selection decision while accounting for dataset size and metric stability.
+
+### Context & Connections with Previous Phase 2 Tasks
+
+Task 5 integrates insights from all previous Phase 2 milestones:
+
+1. **Model Training**: Initial baseline training established the NLP text classification approach using TF-IDF feature vectors.
+2. **Hyperparameter Tuning**: Grid search identified optimal model hyperparameters (`C=0.1` for Logistic Regression, `C=1.0` linear kernel for SVM, and `n_estimators=50`, `max_depth=None` for Random Forest).
+3. **Model Architecture Comparison**: Candidate model families (linear vs. margin-based vs. decision tree ensemble) were evaluated.
+4. **Experiment Tracking**: MLflow was implemented in `track_experiments.py` to record model runs, parameters, metrics, and model artifacts.
+5. **Selection & Validation**: Stratified K-Fold Cross-Validation is now applied in `select_validate.py` to evaluate model variance across multiple folds and select the optimal model.
+
+### Preprocessing & Validation Methodology
+
+- **Dataset**: `training_data_balanced.csv` (12 text samples, balanced binary classification).
+- **Text Feature Extraction**: `TfidfVectorizer` (English stop-word removal).
+- **Cross-Validation Strategy**: 5-Fold Stratified K-Fold Cross-Validation (`StratifiedKFold(n_splits=5, shuffle=True, random_state=42)`), automatically configured based on the minor class count to prevent data leakage and handle class distribution safely.
+
+### Cross-Validation Results
+
+The table below summarizes the mean and standard deviation for Accuracy, Precision, Recall, and F1 Score across 5 cross-validation folds:
+
+| Model | Accuracy Mean (±Std) | Precision Mean (±Std) | Recall Mean (±Std) | F1 Mean (±Std) |
+|---|---|---|---|---|
+| **Logistic Regression** | 0.5333 (±0.2449) | 0.4667 (±0.3232) | 0.8000 (±0.4000) | 0.5667 (±0.3266) |
+| **SVM** | 0.6667 (±0.1826) | 0.6000 (±0.3742) | 0.7000 (±0.4000) | 0.6000 (±0.3266) |
+| **Random Forest** | **0.9000 (±0.2000)** | **0.9000 (±0.2000)** | **1.0000 (±0.0000)** | **0.9333 (±0.1333)** |
+
+### Model Selection & Rationale
+
+* **Selected Model**: **Random Forest** (`n_estimators=50`, `max_depth=None`, `random_state=42`)
+* **Selection Reason**:
+  - Random Forest achieved the highest **Mean F1 Score of 0.9333 (±0.1333)** across 5 cross-validation folds.
+  - F1 Score was chosen as the primary selection metric because academic plagiarism detection requires a balance between Precision (avoiding false accusations) and Recall (catching actual plagiarized submissions).
+  - Random Forest exhibited lower standard deviation in F1 score (0.1333) compared to Logistic Regression (0.3266) and SVM (0.3266), indicating superior stability on the prototype dataset.
+
+### Small Dataset Limitation & Validation Warning
+
+* **Baseline Benchmark Status**: The current dataset contains only 12 training samples and 2 test samples.
+* **Metric Instability**: Cross-validation on small sample sizes yields high standard deviations. The reported metrics serve strictly as a preliminary prototype benchmark and must **NOT** be interpreted as production-ready accuracy.
+
+### How to Run Validation
+
+1. Open PowerShell in the project directory: `l:\mlproject`.
+2. Ensure required Python packages (`pandas`, `scikit-learn`, `matplotlib`, `numpy`) are installed.
+3. Run the validation script:
+
+```bash
+python select_validate.py
+```
+
+4. The script will output validation metrics to the terminal and automatically generate the following 3 files:
+   - `validation_results.csv`: Contains tabular mean and standard deviation metrics for all models across all folds.
+   - `model_selection_report.txt`: Detailed text report summarizing dataset stats, hyperparameters, fold metrics, selection rationale, and limitations.
+   - `model_validation_comparison.png`: High-resolution error-bar chart visualizing Mean F1 Scores (±Std Dev) across candidate models.
+
+### Future Improvements
+
+- **Larger Plagiarism Dataset**: Expand sample collection with real-world student essays and reference text sources.
+- **Advanced Semantic Features**: Incorporate n-gram embeddings, sentence similarity measures, and transformer models (e.g., BERT/RoBERTa).
+- **Production MLflow Deployment**: Register the selected Random Forest model in the MLflow Model Registry for automated deployment and monitoring.
+
 
