@@ -1,0 +1,222 @@
+
+============================================================
+MODEL MONITORING REPORT
+AI-POWERED ACADEMIC INTEGRITY CHECKER
+============================================================
+
+1. OBJECTIVE
+------------------------------------------------------------
+
+A model monitoring system was implemented to monitor the
+behaviour and operational performance of the deployed
+Random Forest model.
+
+The monitoring system tracks:
+
+- Prediction distribution
+- Prediction latency
+- Model accuracy
+- Prediction distribution drift
+- Monitoring thresholds
+- Alerts
+
+
+2. MONITORED MODEL
+------------------------------------------------------------
+
+Model:
+    RandomForestClassifier
+
+Monitoring samples:
+    12
+
+
+3. PREDICTION DISTRIBUTION
+------------------------------------------------------------
+
+The system records the distribution of predictions made by
+the model.
+
+Original predictions:
+    41.67%
+
+Plagiarized predictions:
+    58.33%
+
+This distribution can be monitored over time to identify
+unusual changes in model behaviour.
+
+
+4. LATENCY MONITORING
+------------------------------------------------------------
+
+Prediction latency is measured for every model prediction.
+
+Average latency:
+    8.4396 ms
+
+Minimum latency:
+    6.9680 ms
+
+Maximum latency:
+    15.3620 ms
+
+Configured latency threshold:
+    100.00 ms
+
+Latency alert:
+    NOT TRIGGERED
+
+The observed latency remained below the configured
+threshold during this monitoring run.
+
+
+5. MODEL PERFORMANCE
+------------------------------------------------------------
+
+Accuracy on the monitoring dataset:
+    0.9167
+
+Percentage:
+    91.67%
+
+
+6. DRIFT DETECTION
+------------------------------------------------------------
+
+The monitoring system compares the current prediction
+distribution against a baseline distribution of:
+
+    Original      : 50%
+    Plagiarized   : 50%
+
+Maximum observed distribution drift:
+    8.33%
+
+Configured drift threshold:
+    20.00%
+
+Drift status:
+    NO DRIFT DETECTED
+
+The observed distribution difference remained below the
+configured threshold.
+
+
+7. ALERTING
+------------------------------------------------------------
+
+The monitoring system generates alerts when configured
+thresholds are exceeded.
+
+Current monitoring result:
+
+    No high-latency alert
+    No prediction distribution drift alert
+
+Overall status:
+    NO ALERTS DETECTED
+
+
+8. MONITORING ARCHITECTURE
+------------------------------------------------------------
+
+The monitoring workflow is:
+
+    Model Serving API
+           |
+           v
+    Model Prediction
+           |
+           v
+    Monitoring Layer
+      /     |      \
+     /      |       \
+Prediction  Latency  Accuracy
+Distribution   |        |
+     \       |       /
+      \      |      /
+           v
+      Drift Detection
+           |
+           v
+        Thresholds
+           |
+           v
+         Alerts
+           |
+           v
+   JSON / CSV Monitoring Logs
+
+
+9. MONITORING FILES
+------------------------------------------------------------
+
+model_monitoring.py
+    Main monitoring implementation.
+
+monitoring_log.json
+    Stores structured monitoring information.
+
+monitoring_results.csv
+    Stores monitoring metrics in tabular format.
+
+prediction_distribution.png
+    Visualizes the model's prediction distribution.
+
+prediction_latency.png
+    Visualizes prediction latency for individual requests.
+
+
+10. LIMITATIONS
+------------------------------------------------------------
+
+This implementation is a prototype monitoring system.
+
+The monitoring dataset contains only 12 samples. Therefore,
+the observed accuracy, prediction distribution, latency, and
+drift values should not be considered representative of
+production behaviour.
+
+The baseline distribution is also a simple 50/50 reference
+distribution.
+
+A production system would require a much larger stream of
+real-world predictions and historical monitoring data.
+
+
+11. FUTURE IMPROVEMENTS
+------------------------------------------------------------
+
+Future improvements could include:
+
+- Continuous monitoring of production traffic
+- Persistent monitoring database
+- Elasticsearch integration
+- Automated alert notifications
+- More advanced statistical drift detection
+- Monitoring precision, recall and F1 over time
+- Historical dashboards
+- Automated model retraining
+- MLflow integration
+- Monitoring infrastructure using Docker
+
+
+12. CONCLUSION
+------------------------------------------------------------
+
+The monitoring system successfully tracks prediction
+distribution, prediction latency, model accuracy and
+distribution drift.
+
+For the current monitoring run, no latency or prediction
+distribution alerts were triggered.
+
+The implementation provides a foundation for continuously
+monitoring the Academic Integrity Checker model and detecting
+potential operational or behavioural changes.
+
+
+============================================================
+END OF MODEL MONITORING REPORT
+============================================================

@@ -590,3 +590,71 @@ Future improvements include:
 - MLflow integration
 - Dynamic traffic allocation
 
+## Phase 3 – Model Monitoring
+
+### Task Objective
+
+Implemented a model monitoring system for the deployed Random Forest plagiarism detection model. The system monitors prediction behaviour, prediction latency, model accuracy, and prediction distribution drift.
+
+### Monitoring Metrics
+
+The monitoring system tracks:
+
+- Prediction distribution
+- Prediction latency
+- Model accuracy
+- Prediction distribution drift
+- Configured monitoring thresholds
+- Alerts when thresholds are exceeded
+
+### Monitoring Results
+
+The monitoring system was tested using 12 samples.
+
+| Metric | Result |
+|---|---:|
+| Model | Random Forest |
+| Monitoring samples | 12 |
+| Accuracy | 91.67% |
+| Original predictions | 41.67% |
+| Plagiarized predictions | 58.33% |
+| Average latency | 8.44 ms |
+| Maximum latency | 15.36 ms |
+| Latency threshold | 100 ms |
+| Maximum distribution drift | 8.33% |
+| Drift threshold | 20% |
+| Alerts | None |
+
+The prediction distribution remained within the configured drift threshold, and the observed prediction latency remained below the configured latency threshold.
+
+### Drift Detection
+
+A 50/50 baseline distribution was used for the prototype:
+
+- Original: 50%
+- Plagiarized: 50%
+
+The maximum observed difference was 8.33%, which is below the configured 20% drift threshold. Therefore, no prediction distribution drift alert was generated.
+
+### Monitoring Architecture
+
+The monitoring workflow is:
+
+```text
+Model Serving API
+       ↓
+Model Prediction
+       ↓
+Monitoring Layer
+   ↙    ↓     ↘
+Prediction  Latency  Accuracy
+Distribution
+       ↓
+Drift Detection
+       ↓
+Threshold Checks
+       ↓
+Alerts
+       ↓
+JSON / CSV Logs
+

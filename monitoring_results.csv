@@ -1,0 +1,2 @@
+timestamp,model,total_predictions,original_percentage,plagiarized_percentage,average_latency_ms,minimum_latency_ms,maximum_latency_ms,accuracy,maximum_drift,drift_detected,latency_alert
+2026-08-26T14:51:48.984524,RandomForestClassifier,12,0.4166666666666667,0.5833333333333334,8.439583330376385,6.9679999724030495,15.362000034656376,0.9166666666666666,0.08333333333333337,False,False

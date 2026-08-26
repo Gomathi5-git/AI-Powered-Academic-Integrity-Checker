@@ -1,0 +1,23 @@
+{
+    "timestamp": "2026-08-26T14:51:48.984524",
+    "model": "RandomForestClassifier",
+    "total_predictions": 12,
+    "prediction_distribution": {
+        "original": 0.4166666666666667,
+        "plagiarized": 0.5833333333333334
+    },
+    "latency": {
+        "average_ms": 8.439583330376385,
+        "minimum_ms": 6.9679999724030495,
+        "maximum_ms": 15.362000034656376
+    },
+    "accuracy": 0.9166666666666666,
+    "drift": {
+        "maximum_distribution_drift": 0.08333333333333337,
+        "threshold": 0.2,
+        "detected": false
+    },
+    "alerts": [
+        "No monitoring alerts detected"
+    ]
+}
