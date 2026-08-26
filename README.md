@@ -658,3 +658,33 @@ Alerts
        ↓
 JSON / CSV Logs
 
+## Phase 4 – Automated Model Retraining Pipeline
+
+### Task Objective
+
+Implemented an automated retraining pipeline for the plagiarism detection model with validation gates to ensure that a new model meets minimum performance requirements before deployment.
+
+### Retraining Workflow
+
+```text
+Training Data
+     ↓
+Data Preparation
+     ↓
+TF-IDF Vectorization
+     ↓
+Random Forest Training
+     ↓
+Model Validation
+     ↓
+Validation Gates
+   ↙       ↘
+ PASS      FAIL
+  ↓          ↓
+Deploy     Reject
+ Model      Model
+  ↓
+Backup Previous Model
+  ↓
+Retraining Log
+
