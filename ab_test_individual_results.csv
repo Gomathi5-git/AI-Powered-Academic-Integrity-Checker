@@ -1,0 +1,13 @@
+model_version,model_name,actual_label,predicted_label,correct
+A,Logistic Regression,original,original,True
+A,Logistic Regression,plagiarized,plagiarized,True
+A,Logistic Regression,original,original,True
+B,Random Forest,original,plagiarized,False
+A,Logistic Regression,original,original,True
+A,Logistic Regression,original,original,True
+B,Random Forest,original,original,True
+B,Random Forest,plagiarized,plagiarized,True
+A,Logistic Regression,plagiarized,plagiarized,True
+B,Random Forest,plagiarized,plagiarized,True
+B,Random Forest,plagiarized,plagiarized,True
+B,Random Forest,plagiarized,plagiarized,True

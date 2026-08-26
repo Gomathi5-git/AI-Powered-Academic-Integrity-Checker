@@ -1,0 +1,3 @@
+Model Version,Model,Requests,Accuracy,Precision,Recall,F1 Score
+A,Logistic Regression,6,1.0,1.0,1.0,1.0
+B,Random Forest,6,0.8333333333333334,0.8,1.0,0.8888888888888888
