@@ -400,4 +400,140 @@ python select_validate.py
 - **Advanced Semantic Features**: Incorporate n-gram embeddings, sentence similarity measures, and transformer models (e.g., BERT/RoBERTa).
 - **Production MLflow Deployment**: Register the selected Random Forest model in the MLflow Model Registry for automated deployment and monitoring.
 
+---
+
+## Phase 3 – Task 1: Build Serving Layer
+
+### Purpose & Overview
+
+The Model Serving Layer provides a production-ready REST API built with **FastAPI** to expose the trained plagiarism classification model for real-time inference. It accepts student submission text via HTTP requests, validates the input using Pydantic, extracts TF-IDF numerical features, passes the vector to the selected **Random Forest** model, and returns structured JSON predictions containing classification labels, plagiarism flags, and confidence scores.
+
+### System Architecture & Data Flow
+
+```text
+Client Request (HTTP POST /predict)
+   ↓
+FastAPI Application (app.py)
+   ↓
+Pydantic Request Validation (PredictionRequest)
+   ↓
+TF-IDF Preprocessing (TfidfVectorizer from tfidf_vectorizer.pkl)
+   ↓
+Random Forest Classification (random_forest_model.pkl)
+   ↓
+Confidence Calculation (predict_proba)
+   ↓
+Structured JSON Response (PredictionResponse)
+```
+
+### Model & Feature Extractor Artifacts
+
+- **Selected Model**: Random Forest Classifier (`n_estimators=50`, `max_depth=None`, `random_state=42`), loaded from `random_forest_model.pkl` (or `best_model.pkl`).
+- **Feature Extractor**: Fitted `TfidfVectorizer` (Vocabulary size: 35 features), loaded from `tfidf_vectorizer.pkl`.
+- **Target Classes**: `original` (Non-plagiarized) and `plagiarized` (Plagiarized submission).
+
+### API Endpoints Summary
+
+| Method | Endpoint | Description | Request Body | Success Response | Error Code |
+|---|---|---|---|---|---|
+| `GET` | `/health` | Service Health Check & Model Metadata | None | `{"status": "healthy", "model": "Random Forest"}` | `503` |
+| `POST` | `/predict` | Academic Plagiarism Prediction | `{"text": "..."}` | `{"prediction": "...", "is_plagiarized": bool, "confidence": float}` | `422` / `500` |
+
+### Input Validation Rules (Pydantic Schema)
+
+All incoming requests to `/predict` are validated using Pydantic v2 schemas (`PredictionRequest`):
+1. **Type Check**: `text` must be a valid string.
+2. **Non-Empty**: `text` cannot be an empty string (`""`).
+3. **Whitespace Check**: `text` cannot consist solely of spaces, tabs, or newlines (`"   "`).
+4. **Length Constraint**: `text` must not exceed `10,000` characters.
+5. **Rejection**: Any violation automatically returns HTTP `422 Unprocessable Entity` with field-level diagnostic error details.
+
+### How to Install Dependencies & Run the Server
+
+1. **Open PowerShell** in the project directory:
+   ```bash
+   cd l:\mlproject
+   ```
+
+2. **Install Required Packages**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Start the FastAPI Server with Uvicorn**:
+   ```bash
+   uvicorn app:app --reload
+   ```
+   *The server will start on `http://127.0.0.1:8000`.*
+
+4. **Access Interactive Swagger / OpenAPI Documentation**:
+   Open your browser to:
+   ```text
+   http://127.0.0.1:8000/docs
+   ```
+
+### How to Run Automated API Tests
+
+To execute the test suite (8 unit & integration tests validating health checks, inference responses, and all validation failure cases):
+
+```bash
+python -m pytest test_api.py
+```
+
+### Example API Request & Response
+
+#### 1. Health Check Request (`GET /health`)
+```powershell
+curl -X GET "http://127.0.0.1:8000/health"
+```
+**Response (`200 OK`)**:
+```json
+{
+  "status": "healthy",
+  "model": "Random Forest"
+}
+```
+
+#### 2. Plagiarism Inference Request (`POST /predict`)
+```powershell
+curl -X POST "http://127.0.0.1:8000/predict" `
+     -H "Content-Type: application/json" `
+     -d '{"text": "Natural language processing helps computers understand human language."}'
+```
+**Response (`200 OK`)**:
+```json
+{
+  "prediction": "plagiarized",
+  "is_plagiarized": true,
+  "confidence": 0.7895
+}
+```
+
+#### 3. Validation Failure Example (`POST /predict` with whitespace text)
+```powershell
+curl -X POST "http://127.0.0.1:8000/predict" `
+     -H "Content-Type: application/json" `
+     -d '{"text": "   "}'
+```
+**Response (`422 Unprocessable Entity`)**:
+```json
+{
+  "detail": [
+    {
+      "type": "value_error",
+      "loc": ["body", "text"],
+      "msg": "Value error, Input text must not contain only whitespace.",
+      "input": "   "
+    }
+  ]
+}
+```
+
+### Small Dataset Limitation & Serving vs. ML Performance Disclaimer
+
+> **Important Distinction**: 
+> - **Serving Layer Functionality**: The FastAPI service architecture, REST endpoints, Pydantic validation, schema handling, and unit test suite are fully operational and robust.
+> - **Model Detection Performance**: The underlying Random Forest model was trained on a prototype dataset of 12 samples. Therefore, returned predictions and confidence scores serve strictly as an integration demonstration. Production deployment requires retraining on a large, representative plagiarism dataset.
+
+
 
