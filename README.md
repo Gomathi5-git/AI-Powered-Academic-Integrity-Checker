@@ -535,5 +535,58 @@ curl -X POST "http://127.0.0.1:8000/predict" `
 > - **Serving Layer Functionality**: The FastAPI service architecture, REST endpoints, Pydantic validation, schema handling, and unit test suite are fully operational and robust.
 > - **Model Detection Performance**: The underlying Random Forest model was trained on a prototype dataset of 12 samples. Therefore, returned predictions and confidence scores serve strictly as an integration demonstration. Production deployment requires retraining on a large, representative plagiarism dataset.
 
+## Phase 3 – A/B Testing
 
+### Task Objective
+
+Implemented A/B testing to compare different machine learning model versions for the Academic Integrity Checker.
+
+### Models Compared
+
+- **Model A:** Logistic Regression
+- **Model B:** Random Forest
+
+The application uses approximately a **50/50 traffic split** between the two model versions.
+
+### A/B Test Results
+
+| Model | Requests | Accuracy | Precision | Recall | F1 Score |
+|---|---:|---:|---:|---:|---:|
+| Logistic Regression | 6 | 1.00 | 1.00 | 1.00 | 1.00 |
+| Random Forest | 6 | 0.8333 | 0.80 | 1.00 | 0.8889 |
+
+In this particular A/B experiment, Logistic Regression achieved the higher F1 score and accuracy. However, the experiment used only 12 samples, so these results should be considered a preliminary prototype comparison rather than statistically significant evidence.
+
+### Implementation
+
+The following files were created:
+
+- `ab_testing.py` – Performs A/B traffic splitting and model prediction.
+- `ab_test_results.csv` – Stores model-level performance metrics.
+- `ab_test_individual_results.csv` – Stores individual predictions and correctness.
+- `ab_test_report.txt` – Documents the A/B testing methodology, results, limitations, and future improvements.
+- `ab_test_comparison.png` – Visual comparison of model performance.
+- `create_ab_report.py` – Generates the A/B testing report and comparison chart.
+
+### Relationship to Model Validation
+
+The A/B testing results are interpreted together with the previous cross-validation results.
+
+The previous validation task selected **Random Forest** based on its highest mean F1 score during 5-fold Stratified Cross-Validation. The A/B test produced different results because it used a very small number of requests and each model received a different subset of the data.
+
+Therefore, the A/B test demonstrates the model comparison and traffic-splitting workflow, while cross-validation remains the stronger basis for model selection.
+
+### Limitations
+
+The current experiment uses only 12 balanced samples. A larger dataset and a larger number of real-world requests would be required for statistically reliable A/B testing.
+
+Future improvements include:
+
+- Larger real-world datasets
+- Longer A/B testing periods
+- Statistical significance testing
+- Latency and resource monitoring
+- Continuous result collection
+- MLflow integration
+- Dynamic traffic allocation
 
