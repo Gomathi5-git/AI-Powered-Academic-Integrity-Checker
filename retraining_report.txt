@@ -1,0 +1,251 @@
+============================================================
+AUTOMATED MODEL RETRAINING PIPELINE REPORT
+AI-POWERED ACADEMIC INTEGRITY CHECKER
+============================================================
+
+1. OBJECTIVE
+------------------------------------------------------------
+
+An automated retraining pipeline was implemented to retrain
+the plagiarism detection model using the latest available
+training data.
+
+The pipeline includes validation gates to ensure that a newly
+trained model meets minimum performance requirements before
+it replaces the currently deployed model.
+
+
+2. RETRAINING PIPELINE
+------------------------------------------------------------
+
+The retraining workflow is:
+
+    Training Data
+          |
+          v
+    Data Preparation
+          |
+          v
+    TF-IDF Vectorization
+          |
+          v
+    Random Forest Training
+          |
+          v
+    Model Validation
+          |
+          v
+    Validation Gates
+       /        \
+     PASS       FAIL
+      |           |
+      v           v
+   Deploy       Reject
+    Model        Model
+      |
+      v
+  Retraining Log
+
+
+3. TRAINING DATA
+------------------------------------------------------------
+
+Dataset:
+    training_data_balanced.csv
+
+Number of samples:
+    12
+
+Class distribution:
+
+    Original:
+        6
+
+    Plagiarized:
+        6
+
+
+4. RETRAINED MODEL
+------------------------------------------------------------
+
+Model:
+    RandomForestClassifier
+
+Vectorization:
+    TF-IDF
+
+The model was retrained using the available training dataset.
+
+
+5. VALIDATION METRICS
+------------------------------------------------------------
+
+Accuracy:
+    91.67%
+
+Precision:
+    85.71%
+
+Recall:
+    100.00%
+
+F1 Score:
+    92.31%
+
+
+6. VALIDATION GATES
+------------------------------------------------------------
+
+The pipeline uses the following minimum performance
+requirements:
+
+Minimum Accuracy:
+    80%
+
+Minimum F1 Score:
+    80%
+
+Validation results:
+
+Accuracy Gate:
+    PASS
+
+F1 Score Gate:
+    PASS
+
+Overall Validation Gate:
+    PASSED
+
+
+7. MODEL DEPLOYMENT
+------------------------------------------------------------
+
+Because the retrained model passed all validation gates,
+the new model was deployed.
+
+New model:
+    retrained_model.pkl
+
+New vectorizer:
+    retrained_tfidf_vectorizer.pkl
+
+The previous deployed model was backed up before replacement.
+
+Previous model backup:
+    best_model_backup.pkl
+
+Previous vectorizer backup:
+    tfidf_vectorizer_backup.pkl
+
+
+8. RETRAINING LOGGING
+------------------------------------------------------------
+
+The pipeline records retraining information in:
+
+    retraining_log.json
+
+The log contains:
+
+- Timestamp
+- Dataset used
+- Dataset size
+- Model type
+- Accuracy
+- Precision
+- Recall
+- F1 Score
+- Validation gate results
+- Deployment status
+- Pipeline runtime
+
+
+9. PIPELINE RESULT
+------------------------------------------------------------
+
+Pipeline status:
+    COMPLETED
+
+Deployment status:
+    DEPLOYED
+
+Runtime:
+    Approximately 0.19 seconds
+
+The retraining pipeline completed successfully and deployed
+the newly trained model after passing the validation gates.
+
+
+10. VALIDATION GATE BEHAVIOUR
+------------------------------------------------------------
+
+The validation gate prevents a poorly performing model from
+being deployed.
+
+If the new model fails either the minimum accuracy or minimum
+F1-score requirement, the pipeline rejects the model and the
+existing deployed model remains unchanged.
+
+This provides a basic safety mechanism for automated model
+retraining.
+
+
+11. LIMITATIONS
+------------------------------------------------------------
+
+The current training dataset contains only 12 samples.
+
+Therefore, the reported performance should not be considered
+representative of production performance.
+
+The validation gates currently use fixed thresholds of 80%
+for accuracy and F1 score.
+
+A production system would require a larger and continuously
+updated dataset together with stronger validation procedures.
+
+
+12. FUTURE IMPROVEMENTS
+------------------------------------------------------------
+
+Future improvements could include:
+
+- Automatic retrieval of new training data
+- Scheduled retraining
+- Elasticsearch integration
+- Redis integration
+- Larger validation datasets
+- Cross-validation
+- Statistical validation gates
+- Automated notification when retraining fails
+- MLflow model versioning
+- Docker-based execution
+- CI/CD integration
+- Automated rollback
+- Production monitoring integration
+
+
+13. CONCLUSION
+------------------------------------------------------------
+
+The automated retraining pipeline successfully retrained a
+Random Forest plagiarism detection model and evaluated it
+using validation gates.
+
+The new model achieved:
+
+    Accuracy: 91.67%
+    F1 Score: 92.31%
+
+Both validation requirements were satisfied.
+
+Therefore, the retrained model was successfully deployed,
+while the previous model was backed up for recovery.
+
+The implementation provides a foundation for safely
+automating future model retraining and deployment.
+
+
+============================================================
+END OF RETRAINING PIPELINE REPORT
+============================================================

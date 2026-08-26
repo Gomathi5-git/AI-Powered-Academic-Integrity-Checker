@@ -1,0 +1,22 @@
+{
+    "timestamp": "2026-08-26T15:17:31.537155",
+    "pipeline_status": "completed",
+    "dataset": "training_data_balanced.csv",
+    "model_type": "RandomForestClassifier",
+    "dataset_size": 12,
+    "metrics": {
+        "accuracy": 0.9166666666666666,
+        "precision": 0.8571428571428571,
+        "recall": 1.0,
+        "f1_score": 0.9230769230769231
+    },
+    "validation_gate": {
+        "minimum_accuracy": 0.8,
+        "minimum_f1": 0.8,
+        "accuracy_passed": true,
+        "f1_passed": true,
+        "overall_passed": true
+    },
+    "deployment_status": "deployed",
+    "runtime_seconds": 0.19446754455566406
+}
