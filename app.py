@@ -1,178 +1,278 @@
-"""
-app.py
-======
-Phase 3 - Task 1: Model Serving Layer API
-
-A FastAPI-based web service that serves the trained Random Forest plagiarism detection
-model for real-time inferences.
-
-Endpoints:
-----------
-- GET  /health   : Health check endpoint returning service status and model metadata.
-- POST /predict  : Plagiarism prediction endpoint accepting submission text and returning
-                   classification label, plagiarism boolean flag, and confidence score.
-"""
-
-import os
-from contextlib import asynccontextmanager
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 import joblib
-import numpy as np
-from fastapi import FastAPI, HTTPException, status
-from pydantic import BaseModel, Field, field_validator
-
-# Paths to saved model and vectorizer artifacts
-MODEL_PATH = "random_forest_model.pkl"
-ALT_MODEL_PATH = "best_model.pkl"
-VECTORIZER_PATH = "tfidf_vectorizer.pkl"
-
-# Global artifact storage
-model = None
-vectorizer = None
+import redis
+import hashlib
+import json
+import time
 
 
-def load_artifacts():
-    """Load the trained model and TF-IDF vectorizer artifacts."""
-    global model, vectorizer
-
-    # Load model
-    if os.path.exists(MODEL_PATH):
-        model = joblib.load(MODEL_PATH)
-    elif os.path.exists(ALT_MODEL_PATH):
-        model = joblib.load(ALT_MODEL_PATH)
-    else:
-        model = None
-
-    # Load vectorizer
-    if os.path.exists(VECTORIZER_PATH):
-        vectorizer = joblib.load(VECTORIZER_PATH)
-    else:
-        vectorizer = None
-
-
-# Load artifacts at module load time so TestClient and Uvicorn have immediate access
-load_artifacts()
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    """Lifespan context manager to handle application startup and shutdown events."""
-    load_artifacts()
-    yield
-
+# ============================================================
+# FASTAPI APPLICATION
+# ============================================================
 
 app = FastAPI(
-    title="AI-Powered Academic Integrity Checker API",
-    description=(
-        "Model serving API for detecting potential plagiarism in academic submissions "
-        "using a trained Random Forest classifier and TF-IDF feature extraction."
-    ),
-    version="1.0.0",
-    lifespan=lifespan
+    title="AI-Powered Academic Integrity Checker",
+    description="Plagiarism detection API with Redis caching",
+    version="2.0"
 )
 
 
-class HealthResponse(BaseModel):
-    """Schema for service health check response."""
-    status: str = Field(..., json_schema_extra={"example": "healthy"})
-    model: str = Field(..., json_schema_extra={"example": "Random Forest"})
+# ============================================================
+# LOAD MODEL AND VECTORIZER
+# ============================================================
+
+try:
+    model = joblib.load("best_model.pkl")
+    vectorizer = joblib.load("tfidf_vectorizer.pkl")
+
+    print("Model and vectorizer loaded successfully.")
+    print(f"Model: {type(model).__name__}")
+
+except Exception as e:
+    print(f"Error loading model/vectorizer: {e}")
+    raise
 
 
-class PredictionRequest(BaseModel):
-    """Schema for incoming plagiarism prediction requests."""
-    text: str = Field(
-        ...,
-        description="The student submission text to analyze for plagiarism.",
-        json_schema_extra={"example": "Artificial intelligence helps computers analyze large amounts of information."}
+# ============================================================
+# REDIS / MEMURAI CONNECTION
+# ============================================================
+
+try:
+    redis_client = redis.Redis(
+        host="localhost",
+        port=6379,
+        decode_responses=True
     )
 
-    @field_validator("text")
-    @classmethod
-    def validate_text(cls, value: str) -> str:
-        if not isinstance(value, str):
-            raise ValueError("Input text must be a string.")
-        if not value:
-            raise ValueError("Input text must not be empty.")
-        if not value.strip():
-            raise ValueError("Input text must not contain only whitespace.")
-        if len(value) > 10000:
-            raise ValueError("Input text exceeds maximum allowed length of 10000 characters.")
-        return value
+    redis_client.ping()
+
+    print("Redis cache connected successfully.")
+
+except Exception as e:
+    print(f"Redis connection failed: {e}")
+    redis_client = None
 
 
-class PredictionResponse(BaseModel):
-    """Schema for structured plagiarism prediction responses."""
-    prediction: str = Field(..., description="Predicted class label ('original' or 'plagiarized').", json_schema_extra={"example": "original"})
-    is_plagiarized: bool = Field(..., description="Boolean flag indicating plagiarism status.", json_schema_extra={"example": False})
-    confidence: float = Field(..., description="Probability confidence score of the predicted label.", json_schema_extra={"example": 0.82})
+# ============================================================
+# REQUEST MODEL
+# ============================================================
+
+class TextRequest(BaseModel):
+    text: str
 
 
-@app.get(
-    "/health",
-    response_model=HealthResponse,
-    summary="Service Health Check",
-    tags=["System"]
-)
-def health_check():
-    """Return health status and model metadata."""
-    if model is None or vectorizer is None:
+# ============================================================
+# HEALTH CHECK
+# ============================================================
+
+@app.get("/")
+def home():
+    return {
+        "message": "AI-Powered Academic Integrity Checker API",
+        "status": "running",
+        "model": type(model).__name__,
+        "redis_cache": redis_client is not None
+    }
+
+
+@app.get("/health")
+def health():
+    redis_status = False
+
+    if redis_client is not None:
+        try:
+            redis_status = redis_client.ping()
+        except Exception:
+            redis_status = False
+
+    return {
+        "status": "healthy",
+        "model_loaded": model is not None,
+        "vectorizer_loaded": vectorizer is not None,
+        "redis_connected": redis_status
+    }
+
+
+# ============================================================
+# PREDICTION WITH REDIS CACHE
+# ============================================================
+
+def predict_with_cache(text: str):
+
+    # --------------------------------------------------------
+    # Create unique cache key
+    # --------------------------------------------------------
+
+    text_hash = hashlib.sha256(
+        text.encode("utf-8")
+    ).hexdigest()
+
+    cache_key = f"plagiarism_prediction:{text_hash}"
+
+
+    # --------------------------------------------------------
+    # Check Redis cache
+    # --------------------------------------------------------
+
+    if redis_client is not None:
+
+        try:
+
+            cached_result = redis_client.get(cache_key)
+
+            if cached_result is not None:
+
+                result = json.loads(cached_result)
+
+                return {
+                    "prediction": result["prediction"],
+                    "cache_hit": True
+                }
+
+        except Exception as e:
+
+            print(f"Redis read error: {e}")
+
+
+    # --------------------------------------------------------
+    # Cache MISS → Run ML model
+    # --------------------------------------------------------
+
+    features = vectorizer.transform([text])
+
+    prediction = model.predict(features)[0]
+
+
+    # --------------------------------------------------------
+    # Store prediction in Redis
+    # --------------------------------------------------------
+
+    result = {
+        "prediction": prediction
+    }
+
+    if redis_client is not None:
+
+        try:
+
+            redis_client.set(
+                cache_key,
+                json.dumps(result),
+                ex=3600
+            )
+
+        except Exception as e:
+
+            print(f"Redis write error: {e}")
+
+
+    return {
+        "prediction": prediction,
+        "cache_hit": False
+    }
+
+
+# ============================================================
+# PLAGIARISM PREDICTION ENDPOINT
+# ============================================================
+
+@app.post("/predict")
+def predict(request: TextRequest):
+
+    # --------------------------------------------------------
+    # Validate input
+    # --------------------------------------------------------
+
+    if not request.text.strip():
+
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Model or vectorizer artifacts are not loaded."
+            status_code=400,
+            detail="Text cannot be empty."
         )
-    return HealthResponse(
-        status="healthy",
-        model="Random Forest"
-    )
 
 
-@app.post(
-    "/predict",
-    response_model=PredictionResponse,
-    summary="Predict Academic Text Plagiarism",
-    tags=["Inference"]
-)
-def predict_plagiarism(request: PredictionRequest):
-    """
-    Analyze student submission text and predict plagiarism probability.
+    # --------------------------------------------------------
+    # Measure total inference latency
+    # --------------------------------------------------------
 
-    - Preprocesses text using fitted TF-IDF vectorizer.
-    - Predicts class label using trained Random Forest model.
-    - Calculates confidence probability score.
-    """
-    if model is None or vectorizer is None:
+    start_time = time.perf_counter()
+
+
+    # --------------------------------------------------------
+    # Prediction with Redis cache
+    # --------------------------------------------------------
+
+    result = predict_with_cache(request.text)
+
+
+    # --------------------------------------------------------
+    # Calculate latency
+    # --------------------------------------------------------
+
+    latency_ms = (
+        time.perf_counter() - start_time
+    ) * 1000
+
+
+    # --------------------------------------------------------
+    # Return API response
+    # --------------------------------------------------------
+
+    return {
+        "text": request.text,
+        "prediction": result["prediction"],
+        "cache_hit": result["cache_hit"],
+        "latency_ms": round(latency_ms, 4)
+    }
+
+
+# ============================================================
+# CACHE MANAGEMENT
+# ============================================================
+
+@app.delete("/cache")
+def clear_cache():
+
+    if redis_client is None:
+
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Model or vectorizer artifacts are not loaded."
+            status_code=503,
+            detail="Redis cache is not available."
         )
 
     try:
-        # Preprocess text with TF-IDF vectorizer
-        features = vectorizer.transform([request.text])
 
-        # Predict label
-        predicted_label = str(model.predict(features)[0])
-
-        # Calculate confidence / probability score
-        confidence = 1.0
-        if hasattr(model, "predict_proba"):
-            probabilities = model.predict_proba(features)[0]
-            classes = list(model.classes_)
-            if predicted_label in classes:
-                label_idx = classes.index(predicted_label)
-                confidence = float(probabilities[label_idx])
-            else:
-                confidence = float(np.max(probabilities))
-
-        is_plagiarized = bool(predicted_label.lower() == "plagiarized")
-
-        return PredictionResponse(
-            prediction=predicted_label,
-            is_plagiarized=is_plagiarized,
-            confidence=round(confidence, 4)
+        keys = redis_client.keys(
+            "plagiarism_prediction:*"
         )
+
+        if keys:
+            redis_client.delete(*keys)
+
+        return {
+            "message": "Prediction cache cleared successfully.",
+            "keys_deleted": len(keys)
+        }
 
     except Exception as e:
+
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Inference error: {str(e)}"
+            status_code=500,
+            detail=f"Unable to clear cache: {e}"
         )
+
+
+# ============================================================
+# APPLICATION STARTUP
+# ============================================================
+
+if __name__ == "__main__":
+
+    import uvicorn
+
+    uvicorn.run(
+        app,
+        host="0.0.0.0",
+        port=8000
+    )

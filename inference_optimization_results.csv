@@ -1,0 +1,9 @@
+Metric,Value
+Baseline Average Latency (ms),7.791008315204333
+Cached Average Latency (ms),0.28790834282214445
+Baseline Minimum Latency (ms),6.539599969983101
+Cached Minimum Latency (ms),0.2625000197440386
+Baseline Maximum Latency (ms),10.427200002595782
+Cached Maximum Latency (ms),0.3328999737277627
+Cache Hit Rate (%),100.0
+Latency Reduction (%),96.30460742468617
