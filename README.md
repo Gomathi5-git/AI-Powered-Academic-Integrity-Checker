@@ -688,3 +688,73 @@ Backup Previous Model
   ↓
 Retraining Log
 
+## Inference Optimization with Redis
+
+The inference process was optimized using Redis/Memurai caching to reduce
+latency for repeated plagiarism detection requests.
+
+### Optimization Approach
+
+The existing Random Forest model uses TF-IDF text transformation before
+making predictions. To avoid repeating this computation for identical
+requests, a Redis-based caching layer was added to the FastAPI application.
+
+The workflow is:
+
+    User Request
+         |
+         v
+    Generate SHA-256 Cache Key
+         |
+         v
+    Check Redis Cache
+       /       \
+    HIT         MISS
+     |            |
+     v            v
+ Return       TF-IDF + Model
+ Result           |
+                  v
+             Store in Redis
+                  |
+                  v
+              Return Result
+
+### Caching Configuration
+
+- Cache system: Redis/Memurai
+- Cache key: SHA-256 hash of input text
+- Cache expiration: 3600 seconds (1 hour)
+- Cache stores: Model prediction results
+- API endpoint: `/predict`
+
+### Performance Testing
+
+The inference process was benchmarked before and after caching.
+
+The Redis cache was tested using repeated requests with the same input.
+The first request resulted in a cache miss and executed the ML model.
+The repeated request resulted in a cache hit and returned the stored
+prediction directly.
+
+In the Redis cache test:
+
+- Cache-miss latency: 10.2123 ms
+- Cache-hit latency: 0.3967 ms
+- Latency reduction: 96.12%
+
+This demonstrates that caching can significantly improve response time
+for repeated requests.
+
+### API Response
+
+The prediction API now reports whether the result was retrieved from
+Redis:
+
+```json
+{
+    "prediction": "original",
+    "cache_hit": true,
+    "latency_ms": 0.3967
+}
+
